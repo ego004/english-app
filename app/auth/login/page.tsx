@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Sparkles, Eye, EyeOff } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,6 +10,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { loginWithEmail } from "@/lib/api"
+import { setAccessToken } from "@/lib/auth-session"
+import { saveAuthenticatedProfile } from "@/lib/learner-profile"
 
 const container = {
   hidden: { opacity: 0 },
@@ -22,6 +26,32 @@ const item = {
 export default function LoginPage() {
   const [role, setRole] = useState<"student" | "parent">("student")
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+    try {
+      const auth = await loginWithEmail({ email, password })
+      setAccessToken(auth.access_token)
+      saveAuthenticatedProfile(auth.user)
+      const requestedNext = typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("next")
+        : null
+      const fallback = role === "parent" ? "/parent" : "/dashboard"
+      const destination = requestedNext && requestedNext.startsWith("/") ? requestedNext : fallback
+      router.push(destination)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -76,16 +106,19 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-4" onSubmit={handleLogin}>
                 <div className="space-y-2">
                   <Label htmlFor="email">
-                    {role === "student" ? "Username" : "Email Address"}
+                    Email Address
                   </Label>
                   <Input
                     id="email"
-                    type={role === "student" ? "text" : "email"}
-                    placeholder={role === "student" ? "Your fun username" : "parent@email.com"}
+                    type="email"
+                    placeholder="you@example.com"
                     className="rounded-xl h-11"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </div>
 
@@ -97,6 +130,9 @@ export default function LoginPage() {
                       type={showPassword ? "text" : "password"}
                       placeholder="Your secret password"
                       className="rounded-xl h-11 pr-10"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
                     />
                     <button
                       type="button"
@@ -115,11 +151,10 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                <Link href={role === "parent" ? "/parent" : "/dashboard"}>
-                  <Button className="w-full rounded-xl h-11" type="button">
-                    {"Let's Go!"}
-                  </Button>
-                </Link>
+                <Button className="w-full rounded-xl h-11" type="submit" disabled={loading}>
+                  {loading ? "Signing in..." : "Let's Go!"}
+                </Button>
+                {error && <p className="text-xs text-coral">{error}</p>}
               </form>
 
               <p className="text-center text-sm text-muted-foreground mt-6">

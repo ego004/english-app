@@ -48,8 +48,8 @@ export default function LandingPage() {
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
             <a href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Testimonials</a>
-            <Link href="/login">
-              <Button variant="ghost" size="sm">Log In</Button>
+            <Link href="/auth/login">
+              <Button variant="ghost" size="sm">Sign In</Button>
             </Link>
             <Link href="/dashboard">
               <Button size="sm" className="rounded-full px-5">

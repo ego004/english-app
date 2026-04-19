@@ -5,19 +5,25 @@ import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import {
   Home, BookOpen, FileText, Video, Brain, Mic, Trophy,
-  Settings, Users, LayoutDashboard, Menu, X, Sparkles,
+  Settings, Users, LayoutDashboard, Menu, X, Sparkles, PenTool, MessageSquare, Activity,
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
-import { avatars, mockStudent } from "@/lib/mock-data"
+import { avatars } from "@/lib/mock-data"
+import { getLearnerProfile } from "@/lib/learner-profile"
+import { getLearnerProgress } from "@/lib/api"
+import { calculateLevel, calculateXp } from "@/lib/gamification"
 
 const studentNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/lessons", label: "Lessons", icon: BookOpen },
+  { href: "/grammar", label: "Grammar", icon: PenTool },
+  { href: "/conversation", label: "Conversation", icon: MessageSquare },
   { href: "/worksheets", label: "Worksheets", icon: FileText },
   { href: "/videos", label: "Videos", icon: Video },
   { href: "/quizzes", label: "Quizzes", icon: Brain },
   { href: "/speaking", label: "Speaking", icon: Mic },
+  { href: "/progress", label: "Progress", icon: Activity },
   { href: "/rewards", label: "Rewards", icon: Trophy },
 ]
 
@@ -29,7 +35,35 @@ const bottomNavItems = [
 export function AppSidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
-  const avatar = avatars.find((a) => a.id === mockStudent.avatar)
+  const [profileName, setProfileName] = useState("Learner")
+  const [profileAvatar, setProfileAvatar] = useState("fox")
+  const [level, setLevel] = useState(0)
+  const avatar = avatars.find((a) => a.id === profileAvatar)
+
+  useEffect(() => {
+    const profile = getLearnerProfile()
+    setProfileName(profile.name)
+    setProfileAvatar(profile.avatar)
+
+    let cancelled = false
+    getLearnerProgress(profile.learnerId, 100)
+      .then((rows) => {
+        if (cancelled) {
+          return
+        }
+        const xp = calculateXp(rows)
+        setLevel(calculateLevel(xp))
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLevel(0)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <>
@@ -59,8 +93,8 @@ export function AppSidebar() {
           </span>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="font-semibold text-sm text-foreground truncate">{mockStudent.name}</p>
-              <p className="text-xs text-muted-foreground">Level {mockStudent.level}</p>
+                  <p className="font-semibold text-sm text-foreground truncate">{profileName}</p>
+              <p className="text-xs text-muted-foreground">Level {level}</p>
             </div>
           )}
         </div>
@@ -127,7 +161,13 @@ export function AppSidebar() {
 export function MobileNav() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
-  const avatar = avatars.find((a) => a.id === mockStudent.avatar)
+  const [profileAvatar, setProfileAvatar] = useState("fox")
+  const avatar = avatars.find((a) => a.id === profileAvatar)
+
+  useEffect(() => {
+    const profile = getLearnerProfile()
+    setProfileAvatar(profile.avatar)
+  }, [])
 
   return (
     <>

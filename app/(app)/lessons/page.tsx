@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
@@ -11,8 +11,9 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { lessons, subjects } from "@/lib/mock-data"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { getLessons, type LessonSummary } from "@/lib/api"
+import { getLearnerProfile } from "@/lib/learner-profile"
 import { cn } from "@/lib/utils"
 
 const container = {
@@ -31,17 +32,63 @@ const levelColors: Record<string, string> = {
   Advanced: "bg-coral-light text-coral",
 }
 
-export default function LessonsPage() {
+function LessonsPageContent() {
   const searchParams = useSearchParams()
   const preselected = searchParams.get("subject") || "all"
   const [selectedSubject, setSelectedSubject] = useState(preselected)
   const [selectedLevel, setSelectedLevel] = useState("all")
+  const [lessons, setLessons] = useState<LessonSummary[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const profile = getLearnerProfile()
+    let cancelled = false
+
+    async function load() {
+      setLoading(true)
+      try {
+        const rows = await getLessons({
+          learner_id: profile.learnerId,
+          age_band: profile.ageBand,
+        })
+        if (!cancelled) {
+          setLessons(rows)
+        }
+      } catch {
+        if (!cancelled) {
+          setLessons([])
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const subjects = useMemo(() => {
+    const map = new Map<string, string>()
+    lessons.forEach((lesson) => {
+      const label = lesson.subject.charAt(0).toUpperCase() + lesson.subject.slice(1)
+      map.set(lesson.subject, label)
+    })
+    return Array.from(map.entries()).map(([id, label]) => ({ id, label }))
+  }, [lessons])
 
   const filtered = lessons.filter((l) => {
     if (selectedSubject !== "all" && l.subject !== selectedSubject) return false
     if (selectedLevel !== "all" && l.level !== selectedLevel) return false
     return true
   })
+
+  if (loading) {
+    return <div className="p-6 md:p-8">Loading lessons...</div>
+  }
 
   return (
     <motion.div
@@ -95,8 +142,8 @@ export default function LessonsPage() {
       {/* Lesson cards */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((lesson) => (
-          <motion.div key={lesson.id} variants={item}>
-            <Link href={lesson.locked ? "#" : `/lessons/${lesson.id}`}>
+          <motion.div key={lesson.code} variants={item}>
+            <Link href={lesson.locked ? "#" : `/lessons/${lesson.code}`}>
               <Card className={cn(
                 "border-0 shadow-sm transition-all h-full",
                 lesson.locked ? "opacity-50 cursor-not-allowed" : "hover:shadow-md cursor-pointer group"
@@ -125,10 +172,10 @@ export default function LessonsPage() {
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{lesson.description}</p>
                   <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" /> {lesson.duration}
+                      <Clock className="h-3 w-3" /> {lesson.duration_minutes} min
                     </span>
                     <span className="flex items-center gap-1">
-                      <Zap className="h-3 w-3 text-sunshine" /> +{lesson.xpReward} XP
+                      <Zap className="h-3 w-3 text-sunshine" /> +{lesson.xp_reward} XP
                     </span>
                   </div>
                   {!lesson.locked && !lesson.completed && (
@@ -156,5 +203,13 @@ export default function LessonsPage() {
         </motion.div>
       )}
     </motion.div>
+  )
+}
+
+export default function LessonsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 md:p-8">Loading lessons...</div>}>
+      <LessonsPageContent />
+    </Suspense>
   )
 }

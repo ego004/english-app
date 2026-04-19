@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Sparkles, Eye, EyeOff, ChevronRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -10,6 +11,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { avatars } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
+import { registerWithEmail } from "@/lib/api"
+import { setAccessToken } from "@/lib/auth-session"
+import { saveAuthenticatedProfile } from "@/lib/learner-profile"
 
 const container = {
   hidden: { opacity: 0 },
@@ -25,6 +29,32 @@ export default function SignupPage() {
   const [role, setRole] = useState<"student" | "parent">("student")
   const [selectedAvatar, setSelectedAvatar] = useState("fox")
   const [showPassword, setShowPassword] = useState(false)
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  async function handleRegister() {
+    setError("")
+    setLoading(true)
+    try {
+      const auth = await registerWithEmail({
+        email,
+        password,
+        name: name || "Learner",
+        avatar: selectedAvatar,
+      })
+      setAccessToken(auth.access_token)
+      saveAuthenticatedProfile(auth.user)
+      router.push(role === "parent" ? "/parent" : "/dashboard")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Signup failed")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -92,19 +122,27 @@ export default function SignupPage() {
                   </div>
 
                   <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setStep(2) }}>
-                    {role === "parent" && (
-                      <div className="space-y-2">
-                        <Label htmlFor="fullname">Full Name</Label>
-                        <Input id="fullname" placeholder="Your name" className="rounded-xl h-11" />
-                      </div>
-                    )}
                     <div className="space-y-2">
-                      <Label htmlFor="email">{role === "student" ? "Choose a Username" : "Email Address"}</Label>
+                      <Label htmlFor="fullname">Full Name</Label>
+                      <Input
+                        id="fullname"
+                        placeholder="Your name"
+                        className="rounded-xl h-11"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address</Label>
                       <Input
                         id="email"
-                        type={role === "student" ? "text" : "email"}
-                        placeholder={role === "student" ? "Pick a cool username" : "parent@email.com"}
+                        type="email"
+                        placeholder="you@example.com"
                         className="rounded-xl h-11"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
                       />
                     </div>
                     <div className="space-y-2">
@@ -115,6 +153,9 @@ export default function SignupPage() {
                           type={showPassword ? "text" : "password"}
                           placeholder="Make it strong!"
                           className="rounded-xl h-11 pr-10"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
                         />
                         <button
                           type="button"
@@ -165,12 +206,11 @@ export default function SignupPage() {
                     <Button variant="outline" className="flex-1 rounded-xl h-11" onClick={() => setStep(1)}>
                       Back
                     </Button>
-                    <Link href="/dashboard" className="flex-1">
-                      <Button className="w-full rounded-xl h-11">
-                        {"Let's Start!"}
-                      </Button>
-                    </Link>
+                    <Button className="flex-1 rounded-xl h-11" disabled={loading} onClick={handleRegister}>
+                      {loading ? "Creating account..." : "Let's Start!"}
+                    </Button>
                   </div>
+                  {error && <p className="text-xs text-coral mt-3">{error}</p>}
                 </>
               )}
 

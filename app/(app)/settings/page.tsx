@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import {
   User, Palette, Volume2, Globe, Moon, Sun, Save,
@@ -13,8 +13,11 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { avatars, mockStudent } from "@/lib/mock-data"
+import { avatars } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
+import { getLearnerProfile, saveLearnerProfile } from "@/lib/learner-profile"
+import { getAccessToken } from "@/lib/auth-session"
+import { updateCurrentUser } from "@/lib/api"
 
 const container = {
   hidden: { opacity: 0 },
@@ -26,15 +29,34 @@ const item = {
 }
 
 export default function SettingsPage() {
-  const [name, setName] = useState(mockStudent.name)
-  const [selectedAvatar, setSelectedAvatar] = useState(mockStudent.avatar)
+  const [name, setName] = useState("Learner")
+  const [selectedAvatar, setSelectedAvatar] = useState("fox")
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
   const [language, setLanguage] = useState("english")
+  const [ageBand, setAgeBand] = useState<"6-10" | "11-15" | "16-21">("11-15")
+  const [proficiencyLevel, setProficiencyLevel] = useState<"beginner" | "intermediate" | "advanced">("beginner")
   const [saved, setSaved] = useState(false)
 
-  function handleSave() {
+  useEffect(() => {
+    const profile = getLearnerProfile()
+    setName(profile.name)
+    setSelectedAvatar(profile.avatar)
+    setAgeBand(profile.ageBand)
+    setProficiencyLevel(profile.proficiencyLevel)
+  }, [])
+
+  async function handleSave() {
     setSaved(true)
+    saveLearnerProfile({ name, avatar: selectedAvatar, ageBand, proficiencyLevel })
+    const token = getAccessToken()
+    if (token) {
+      try {
+        await updateCurrentUser(token, { name, avatar: selectedAvatar })
+      } catch {
+        // keep local save as fallback when token is stale
+      }
+    }
     if (darkMode) {
       document.documentElement.classList.add("dark")
     } else {
@@ -178,6 +200,57 @@ export default function SettingsPage() {
                     <SelectItem value="french">French</SelectItem>
                     <SelectItem value="arabic">Arabic</SelectItem>
                     <SelectItem value="chinese">Chinese</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-sky-light flex items-center justify-center">
+                    <User className="h-5 w-5 text-sky" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Age Band</p>
+                    <p className="text-xs text-muted-foreground">Used to tune challenge difficulty</p>
+                  </div>
+                </div>
+                <Select value={ageBand} onValueChange={(value) => setAgeBand(value as "6-10" | "11-15" | "16-21")}>
+                  <SelectTrigger className="w-36 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="6-10">6-10</SelectItem>
+                    <SelectItem value="11-15">11-15</SelectItem>
+                    <SelectItem value="16-21">16-21</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-mint-light flex items-center justify-center">
+                    <Palette className="h-5 w-5 text-mint" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Difficulty Preset</p>
+                    <p className="text-xs text-muted-foreground">Controls AI response complexity</p>
+                  </div>
+                </div>
+                <Select
+                  value={proficiencyLevel}
+                  onValueChange={(value) => setProficiencyLevel(value as "beginner" | "intermediate" | "advanced")}
+                >
+                  <SelectTrigger className="w-36 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

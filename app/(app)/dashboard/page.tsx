@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -9,7 +10,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { mockStudent, subjects, avatars, dailyChallenges } from "@/lib/mock-data"
+import { avatars, dailyChallenges } from "@/lib/mock-data"
+import { getLearnerProgress, type ProgressInteraction } from "@/lib/api"
+import { getLearnerProfile, type LearnerProfile } from "@/lib/learner-profile"
+import { calculateLevel, calculateStreak, calculateXp } from "@/lib/gamification"
 import { cn } from "@/lib/utils"
 
 const colorMap: Record<string, { bg: string; text: string; light: string }> = {
@@ -30,11 +34,50 @@ const item = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 }
 
+const subjectMeta = [
+  { id: "grammar", label: "Grammar", color: "sunshine", icon: BookOpen },
+  { id: "conversation", label: "Conversation", color: "sky", icon: BookOpen },
+  { id: "speaking", label: "Speaking", color: "mint", icon: BookOpen },
+]
+
 export default function DashboardPage() {
-  const avatar = avatars.find((a) => a.id === mockStudent.avatar)
-  const overallProgress = Math.round(
-    (mockStudent.completedLessons / mockStudent.totalLessons) * 100
-  )
+  const [profile, setProfile] = useState<LearnerProfile | null>(null)
+  const [rows, setRows] = useState<ProgressInteraction[]>([])
+
+  useEffect(() => {
+    const learnerProfile = getLearnerProfile()
+    setProfile(learnerProfile)
+
+    let cancelled = false
+    getLearnerProgress(learnerProfile.learnerId, 100)
+      .then((data) => {
+        if (!cancelled) {
+          setRows(data)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRows([])
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const fallbackAvatar = "fox"
+  const avatar = avatars.find((a) => a.id === (profile?.avatar || fallbackAvatar))
+  const xp = calculateXp(rows)
+  const level = calculateLevel(xp)
+  const streak = calculateStreak(rows)
+  const activityCount = rows.length
+  const activityGoal = 50
+  const overallProgress = Math.min(100, Math.round((activityCount / activityGoal) * 100))
+  const subjectCounts = rows.reduce<Record<string, number>>((acc, row) => {
+    acc[row.feature] = (acc[row.feature] || 0) + 1
+    return acc
+  }, {})
 
   return (
     <motion.div
@@ -51,7 +94,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Hey, {mockStudent.name}!
+              Hey, {profile?.name || mockStudent.name}!
             </h1>
             <p className="text-muted-foreground text-sm mt-0.5">Ready for another day of learning?</p>
           </div>
@@ -67,10 +110,10 @@ export default function DashboardPage() {
       {/* Stats Row */}
       <motion.div variants={item} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { icon: Zap, label: "XP Points", value: mockStudent.xp.toLocaleString(), bg: "bg-sunshine-light", iconColor: "text-sunshine" },
-          { icon: Star, label: "Level", value: mockStudent.level, bg: "bg-sky-light", iconColor: "text-sky" },
-          { icon: Flame, label: "Day Streak", value: `${mockStudent.streak} days`, bg: "bg-coral-light", iconColor: "text-coral" },
-          { icon: Trophy, label: "Badges", value: mockStudent.badges.length, bg: "bg-lavender-light", iconColor: "text-lavender" },
+          { icon: Zap, label: "XP Points", value: xp.toLocaleString(), bg: "bg-sunshine-light", iconColor: "text-sunshine" },
+          { icon: Star, label: "Level", value: level, bg: "bg-sky-light", iconColor: "text-sky" },
+          { icon: Flame, label: "Day Streak", value: `${streak} days`, bg: "bg-coral-light", iconColor: "text-coral" },
+          { icon: Trophy, label: "Activities", value: activityCount, bg: "bg-lavender-light", iconColor: "text-lavender" },
         ].map((stat) => (
           <Card key={stat.label} className="border-0 shadow-sm">
             <CardContent className="p-4 flex items-center gap-3">
@@ -91,12 +134,12 @@ export default function DashboardPage() {
         <Card className="border-0 shadow-sm mb-8">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display text-lg font-bold text-foreground">Overall Progress</h2>
+                <h2 className="font-display text-lg font-bold text-foreground">Learning Progress</h2>
               <span className="text-sm font-semibold text-primary">{overallProgress}%</span>
             </div>
             <Progress value={overallProgress} className="h-3 rounded-full" />
             <p className="text-xs text-muted-foreground mt-2">
-              {mockStudent.completedLessons} of {mockStudent.totalLessons} lessons completed
+                {activityCount} of {activityGoal} learning activities completed
             </p>
           </CardContent>
         </Card>
@@ -104,10 +147,12 @@ export default function DashboardPage() {
 
       {/* Subject Cards */}
       <motion.div variants={item}>
-        <h2 className="font-display text-lg font-bold text-foreground mb-4">Subjects</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Activity Breakdown</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {subjects.map((subject, i) => {
+            {subjectMeta.map((subject) => {
             const colors = colorMap[subject.color] || colorMap.sky
+              const count = subjectCounts[subject.id] || 0
+              const completion = Math.min(100, count * 10)
             return (
               <motion.div key={subject.id} variants={item}>
                 <Link href={`/lessons?subject=${subject.id}`}>
@@ -118,14 +163,14 @@ export default function DashboardPage() {
                           <BookOpen className={cn("h-6 w-6", colors.text)} />
                         </div>
                         <span className={cn("text-xs font-semibold px-2 py-1 rounded-full", colors.light, colors.text)}>
-                          {subject.completion}%
+                          {completion}%
                         </span>
                       </div>
                       <h3 className="font-display font-bold text-foreground group-hover:text-primary transition-colors">
                         {subject.label}
                       </h3>
-                      <Progress value={subject.completion} className="h-2 rounded-full mt-3" />
-                      <p className="text-xs text-muted-foreground mt-2">{subject.totalLessons} lessons</p>
+                      <Progress value={completion} className="h-2 rounded-full mt-3" />
+                      <p className="text-xs text-muted-foreground mt-2">{count} activities</p>
                     </CardContent>
                   </Card>
                 </Link>

@@ -52,8 +52,9 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
     )
   }
 
-  const question = quiz.questions[currentQuestion]
-  const totalQuestions = quiz.questions.length
+  const quizQuestions = quiz.questions
+  const question = quizQuestions[currentQuestion]
+  const totalQuestions = quizQuestions.length
   const progress = ((currentQuestion + 1) / totalQuestions) * 100
 
   function handleAnswer(value: string) {
@@ -70,12 +71,12 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
   }
 
   function isCorrect(questionId: string) {
-    const q = quiz.questions.find((q) => q.id === questionId)
+    const q = quizQuestions.find((q) => q.id === questionId)
     if (!q) return false
     return answers[questionId]?.toLowerCase().trim() === q.answer.toLowerCase().trim()
   }
 
-  const score = quiz.questions.filter((q) => isCorrect(q.id)).length
+  const score = quizQuestions.filter((q) => isCorrect(q.id)).length
   const scorePercent = Math.round((score / totalQuestions) * 100)
   const stars = scorePercent >= 90 ? 5 : scorePercent >= 75 ? 4 : scorePercent >= 60 ? 3 : scorePercent >= 40 ? 2 : 1
 
@@ -205,7 +206,7 @@ export default function QuizPage({ params }: { params: Promise<{ id: string }> }
 
             {/* Answer review */}
             <div className="space-y-2 mb-8 text-left">
-              {quiz.questions.map((q, i) => {
+              {quizQuestions.map((q, i) => {
                 const correct = isCorrect(q.id)
                 return (
                   <div

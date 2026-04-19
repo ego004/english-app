@@ -1,6 +1,6 @@
 "use client"
 
-import { use } from "react"
+import { use, useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -10,7 +10,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { lessons } from "@/lib/mock-data"
+import { completeLesson, getLessonByCode, type LessonDetail } from "@/lib/api"
+import { getLearnerProfile } from "@/lib/learner-profile"
 import { cn } from "@/lib/utils"
 
 const container = {
@@ -24,7 +25,56 @@ const item = {
 
 export default function LessonDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const lesson = lessons.find((l) => l.id === id)
+  const [lesson, setLesson] = useState<LessonDetail | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [markingComplete, setMarkingComplete] = useState(false)
+
+  useEffect(() => {
+    const profile = getLearnerProfile()
+    let cancelled = false
+
+    async function load() {
+      setLoading(true)
+      try {
+        const data = await getLessonByCode({ learner_id: profile.learnerId, lesson_code: id })
+        if (!cancelled) {
+          setLesson(data)
+        }
+      } catch {
+        if (!cancelled) {
+          setLesson(null)
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [id])
+
+  async function handleComplete() {
+    if (!lesson || lesson.completed || markingComplete) {
+      return
+    }
+
+    setMarkingComplete(true)
+    try {
+      const profile = getLearnerProfile()
+      await completeLesson({ learner_id: profile.learnerId, lesson_code: lesson.code })
+      setLesson({ ...lesson, completed: true })
+    } finally {
+      setMarkingComplete(false)
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8 text-center">Loading lesson...</div>
+  }
 
   if (!lesson) {
     return (
@@ -60,8 +110,8 @@ export default function LessonDetailPage({ params }: { params: Promise<{ id: str
           <Badge variant="secondary" className="text-xs font-semibold">{lesson.level}</Badge>
         </div>
         <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground">
-          <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{lesson.duration}</span>
-          <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-sunshine" />+{lesson.xpReward} XP</span>
+          <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{lesson.duration_minutes} min</span>
+          <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-sunshine" />+{lesson.xp_reward} XP</span>
           <span className="flex items-center gap-1.5 capitalize"><BookOpen className="h-4 w-4" />{lesson.subject}</span>
         </div>
       </motion.div>
@@ -74,7 +124,7 @@ export default function LessonDetailPage({ params }: { params: Promise<{ id: str
             <Card className="border-0 shadow-sm mb-6">
               <CardContent className="p-6">
                 <h2 className="font-display text-lg font-bold text-foreground mb-3">Lesson</h2>
-                <p className="text-foreground leading-relaxed">{lesson.content.explanation}</p>
+                  <p className="text-foreground leading-relaxed">{lesson.content.explanation}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -108,6 +158,9 @@ export default function LessonDetailPage({ params }: { params: Promise<{ id: str
 
           {/* Try Now CTA */}
           <motion.div variants={item} className="flex flex-col sm:flex-row gap-4">
+            <Button size="lg" variant="default" className="rounded-full shadow-md w-full sm:w-auto" onClick={handleComplete} disabled={lesson.completed || markingComplete}>
+              {lesson.completed ? "Completed" : markingComplete ? "Saving..." : "Mark Complete"}
+            </Button>
             <Link href="/quizzes">
               <Button size="lg" className="rounded-full shadow-md w-full sm:w-auto">
                 Try a Quiz

@@ -10,8 +10,38 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Textarea } from "@/components/ui/textarea"
 import { speakingPrompts } from "@/lib/mock-data"
 import { cn } from "@/lib/utils"
+import { getSpeakingFeedback, type SpeakingFeedbackResponse } from "@/lib/api"
+import { getLearnerProfile } from "@/lib/learner-profile"
+
+type BrowserSpeechRecognition = {
+  lang: string
+  interimResults: boolean
+  continuous: boolean
+  onresult: ((event: SpeechRecognitionEvent) => void) | null
+  onerror: ((event: { error: string }) => void) | null
+  onend: (() => void) | null
+  start: () => void
+  stop: () => void
+}
+
+type SpeechRecognitionEvent = {
+  resultIndex: number
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string
+      }
+    }
+  }
+}
+
+type SpeechWindow = Window & {
+  SpeechRecognition?: new () => BrowserSpeechRecognition
+  webkitSpeechRecognition?: new () => BrowserSpeechRecognition
+}
 
 const container = {
   hidden: { opacity: 0 },
@@ -33,8 +63,48 @@ export default function SpeakingPage() {
   const [isRecording, setIsRecording] = useState(false)
   const [hasRecorded, setHasRecorded] = useState(false)
   const [recordingTime, setRecordingTime] = useState(0)
+  const [transcript, setTranscript] = useState("")
+  const [voiceError, setVoiceError] = useState<string | null>(null)
+  const [voiceSupported, setVoiceSupported] = useState(true)
   const [showFeedback, setShowFeedback] = useState(false)
+  const [feedback, setFeedback] = useState<SpeakingFeedbackResponse | null>(null)
+  const [isLoadingFeedback, setIsLoadingFeedback] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null)
+
+  useEffect(() => {
+    const speechWindow = window as SpeechWindow
+    const RecognitionCtor = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition
+    if (!RecognitionCtor) {
+      setVoiceSupported(false)
+      return
+    }
+
+    const recognition = new RecognitionCtor()
+    recognition.lang = "en-US"
+    recognition.interimResults = true
+    recognition.continuous = true
+
+    recognition.onresult = (event) => {
+      let fullText = ""
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        fullText += event.results[index][0].transcript
+      }
+      setTranscript((prev) => `${prev} ${fullText}`.trim())
+    }
+
+    recognition.onerror = (event) => {
+      setVoiceError(`Voice input error: ${event.error}`)
+      setIsRecording(false)
+    }
+
+    recognition.onend = () => {
+      setIsRecording(false)
+      setHasRecorded(true)
+    }
+
+    recognitionRef.current = recognition
+  }, [])
 
   useEffect(() => {
     if (isRecording) {
@@ -49,16 +119,37 @@ export default function SpeakingPage() {
     }
   }, [isRecording])
 
+  function analyzeTranscript() {
+    if (!transcript.trim()) {
+      setVoiceError("Please record or type a transcript first.")
+      return
+    }
+    setHasRecorded(true)
+    setShowFeedback(true)
+  }
+
   function toggleRecording() {
     if (isRecording) {
+      recognitionRef.current?.stop()
       setIsRecording(false)
       setHasRecorded(true)
-      setShowFeedback(true)
+      if (transcript.trim()) {
+        setShowFeedback(true)
+      }
     } else {
+      setVoiceError(null)
       setIsRecording(true)
       setHasRecorded(false)
       setShowFeedback(false)
       setRecordingTime(0)
+      if (voiceSupported) {
+        try {
+          recognitionRef.current?.start()
+        } catch {
+          setVoiceError("Unable to start microphone. Please allow mic permission or type your answer.")
+          setIsRecording(false)
+        }
+      }
     }
   }
 
@@ -67,11 +158,56 @@ export default function SpeakingPage() {
     setHasRecorded(false)
     setShowFeedback(false)
     setRecordingTime(0)
+    setTranscript("")
+    setVoiceError(null)
+    setIsLoadingFeedback(false)
   }
 
-  // Mock pronunciation score
-  const mockScore = Math.floor(Math.random() * 20) + 75
-  const stars = mockScore >= 90 ? 5 : mockScore >= 80 ? 4 : mockScore >= 70 ? 3 : 2
+  useEffect(() => {
+    if (!showFeedback) {
+      return
+    }
+
+    let cancelled = false
+
+    async function fetchFeedback() {
+      setIsLoadingFeedback(true)
+      try {
+        const profile = getLearnerProfile()
+        const transcriptText = transcript.trim() || selectedPrompt.text
+        const result = await getSpeakingFeedback({
+          learner_id: profile.learnerId,
+          prompt: selectedPrompt.text,
+          transcript: transcriptText,
+        })
+        if (!cancelled) {
+          setFeedback(result)
+        }
+      } catch {
+        if (!cancelled) {
+          setFeedback({
+            score: 78,
+            strengths: ["Good confidence", "Clear sentence flow"],
+            improvements: ["Slow down on long words", "Stress key syllables clearly"],
+            rewritten_sentence: selectedPrompt.text,
+          })
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingFeedback(false)
+        }
+      }
+    }
+
+    fetchFeedback()
+
+    return () => {
+      cancelled = true
+    }
+  }, [showFeedback, selectedPrompt.text, transcript])
+
+  const score = feedback?.score ?? 0
+  const stars = score >= 90 ? 5 : score >= 80 ? 4 : score >= 70 ? 3 : 2
 
   return (
     <motion.div
@@ -131,6 +267,12 @@ export default function SpeakingPage() {
               Listen First
             </Button>
 
+            {!voiceSupported && (
+              <p className="text-xs text-muted-foreground mb-4">
+                Voice input is not supported in this browser. Type your answer below.
+              </p>
+            )}
+
             {/* Mic button with wave */}
             <div className="relative flex flex-col items-center">
               {isRecording && (
@@ -176,7 +318,7 @@ export default function SpeakingPage() {
               )}
 
               {!isRecording && !hasRecorded && (
-                <p className="mt-4 text-sm text-muted-foreground">Tap to start recording</p>
+                <p className="mt-4 text-sm text-muted-foreground">Tap to start recording (or type below)</p>
               )}
             </div>
 
@@ -197,6 +339,32 @@ export default function SpeakingPage() {
                 ))}
               </motion.div>
             )}
+
+            <div className="mt-6 text-left max-w-2xl mx-auto">
+              <label className="text-xs font-semibold text-muted-foreground">Transcript</label>
+              <Textarea
+                value={transcript}
+                onChange={(event) => {
+                  setTranscript(event.target.value)
+                  setShowFeedback(false)
+                  setVoiceError(null)
+                }}
+                placeholder="Your spoken text appears here. You can also type it manually."
+                className="mt-2 min-h-28"
+              />
+
+              {voiceError && (
+                <p className="text-xs text-coral mt-2">{voiceError}</p>
+              )}
+
+              {!isRecording && transcript.trim().length > 0 && (
+                <div className="mt-3 flex justify-end">
+                  <Button className="rounded-full" onClick={analyzeTranscript}>
+                    Analyze Speech
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -216,7 +384,7 @@ export default function SpeakingPage() {
 
                 {/* Score */}
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-light mb-4">
-                  <span className="font-display text-2xl font-bold text-foreground">{mockScore}</span>
+                  <span className="font-display text-2xl font-bold text-foreground">{isLoadingFeedback ? "..." : score}</span>
                   <span className="text-sm text-muted-foreground">/100</span>
                 </div>
 
@@ -233,11 +401,29 @@ export default function SpeakingPage() {
                   ))}
                 </div>
 
-                <Progress value={mockScore} className="h-2 rounded-full max-w-xs mx-auto mb-4" />
+                <Progress value={isLoadingFeedback ? 0 : score} className="h-2 rounded-full max-w-xs mx-auto mb-4" />
 
                 <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-                  Great pronunciation! Your intonation is improving. Try to slow down a little on the longer words for even better clarity.
+                  {isLoadingFeedback
+                    ? "Analyzing your speaking..."
+                    : feedback
+                      ? `${feedback.strengths.join(". ")}. Improve: ${feedback.improvements.join(". ")}.`
+                      : "Great effort! Keep practicing to improve pronunciation."}
                 </p>
+
+                {!isLoadingFeedback && feedback?.rubric && (
+                  <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                    {Object.entries(feedback.rubric).map(([key, value]) => (
+                      <div key={key} className="rounded-xl border border-border bg-card p-3">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="capitalize text-muted-foreground">{key}</span>
+                          <span className="font-semibold text-foreground">{value}</span>
+                        </div>
+                        <Progress value={value} className="h-2 rounded-full" />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex items-center justify-center gap-3 mt-6">
                   <Button variant="outline" className="rounded-full gap-1" onClick={reset}>
