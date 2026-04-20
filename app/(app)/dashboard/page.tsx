@@ -94,7 +94,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h1 className="font-display text-2xl md:text-3xl font-bold text-foreground">
-              Hey, {profile?.name || mockStudent.name}!
+              Hey, {profile?.name || "Learner"}!
             </h1>
             <p className="text-muted-foreground text-sm mt-0.5">Ready for another day of learning?</p>
           </div>

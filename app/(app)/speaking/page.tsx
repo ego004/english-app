@@ -94,7 +94,17 @@ export default function SpeakingPage() {
     }
 
     recognition.onerror = (event) => {
-      setVoiceError(`Voice input error: ${event.error}`)
+      let errorMsg = "Voice input error"
+      if (event.error === "network") {
+        errorMsg = "Network error: Unable to reach speech recognition service. Check your internet connection or allow microphone permission. You can type your answer instead."
+      } else if (event.error === "no-speech") {
+        errorMsg = "No speech detected. Please try again or type your answer."
+      } else if (event.error === "audio-capture") {
+        errorMsg = "Microphone not found or permission denied. Please allow microphone access or type your answer."
+      } else {
+        errorMsg = `Voice input error: ${event.error}. You can type your answer instead.`
+      }
+      setVoiceError(errorMsg)
       setIsRecording(false)
     }
 

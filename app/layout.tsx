@@ -53,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${_nunito.variable} ${_baloo2.variable} font-sans antialiased`}>
+      <body suppressHydrationWarning className={`${_nunito.variable} ${_baloo2.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
