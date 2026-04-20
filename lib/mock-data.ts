@@ -228,6 +228,154 @@ export const worksheets: Worksheet[] = [
       { id: "q2", question: "Arrange: likes / She / ice cream / to eat", answer: "She likes to eat ice cream" },
     ]
   },
+  {
+    id: "ws-6", title: "Food Vocabulary", subject: "vocabulary", level: "Beginner",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "I eat ___ for breakfast.", options: ["bread", "book", "shoe"], answer: "bread" },
+      { id: "q2", question: "Milk comes from a ___.", options: ["dog", "cow", "bird"], answer: "cow" },
+      { id: "q3", question: "An ___ is round and sweet.", options: ["apple", "car", "pen"], answer: "apple" },
+      { id: "q4", question: "We drink ___ when thirsty.", options: ["water", "sand", "rock"], answer: "water" },
+    ]
+  },
+  {
+    id: "ws-7", title: "Numbers 1-20", subject: "vocabulary", level: "Beginner",
+    type: "puzzle", completed: false,
+    questions: [
+      { id: "q1", question: "Spell: 5", answer: "FIVE" },
+      { id: "q2", question: "Spell: 10", answer: "TEN" },
+      { id: "q3", question: "Spell: 15", answer: "FIFTEEN" },
+      { id: "q4", question: "Spell: 20", answer: "TWENTY" },
+    ]
+  },
+  {
+    id: "ws-8", title: "Family Words", subject: "vocabulary", level: "Beginner",
+    type: "match", completed: false,
+    questions: [
+      { id: "q1", question: "Match family members", answer: "", pairs: [
+        { left: "Mother", right: "Female parent" }, { left: "Father", right: "Male parent" },
+        { left: "Sister", right: "Female sibling" }, { left: "Brother", right: "Male sibling" },
+      ] },
+    ]
+  },
+  {
+    id: "ws-9", title: "Plurals Practice", subject: "grammar", level: "Intermediate",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "One cat, two ___.", options: ["cats", "cat", "cates"], answer: "cats" },
+      { id: "q2", question: "One box, two ___.", options: ["boxes", "boxs", "box"], answer: "boxes" },
+      { id: "q3", question: "One child, two ___.", options: ["childs", "children", "child"], answer: "children" },
+      { id: "q4", question: "One foot, two ___.", options: ["foots", "feet", "foot"], answer: "feet" },
+    ]
+  },
+  {
+    id: "ws-10", title: "Adjective Matching", subject: "grammar", level: "Intermediate",
+    type: "match", completed: false,
+    questions: [
+      { id: "q1", question: "Match opposites", answer: "", pairs: [
+        { left: "Big", right: "Small" }, { left: "Hot", right: "Cold" },
+        { left: "Happy", right: "Sad" }, { left: "Fast", right: "Slow" },
+      ] },
+    ]
+  },
+  {
+    id: "ws-11", title: "Past Tense Verbs", subject: "grammar", level: "Intermediate",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "Yesterday I ___ (play) in the park.", options: ["played", "play", "plays"], answer: "played" },
+      { id: "q2", question: "She ___ (eat) her lunch.", options: ["eats", "eaten", "ate"], answer: "ate" },
+      { id: "q3", question: "They ___ (go) to the beach.", options: ["goes", "went", "go"], answer: "went" },
+      { id: "q4", question: "We ___ (see) a movie.", options: ["saw", "see", "seen"], answer: "saw" },
+    ]
+  },
+  {
+    id: "ws-12", title: "Body Parts", subject: "vocabulary", level: "Beginner",
+    type: "match", completed: false,
+    questions: [
+      { id: "q1", question: "Match body parts to function", answer: "", pairs: [
+        { left: "Eyes", right: "See" }, { left: "Ears", right: "Hear" },
+        { left: "Mouth", right: "Eat" }, { left: "Hands", right: "Touch" },
+      ] },
+    ]
+  },
+  {
+    id: "ws-13", title: "Conditional Sentences Practice", subject: "grammar", level: "Intermediate",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "If I had known, I ___ told you.", options: ["would have", "have", "would", "had"], answer: "would have" },
+      { id: "q2", question: "Unless you ___, you will fail.", options: ["studied", "study", "studying", "studies"], answer: "study" },
+      { id: "q3", question: "If she ___ harder, she would pass.", options: ["studied", "studies", "study", "studying"], answer: "studied" },
+      { id: "q4", question: "Provided that you arrive on time, we ___ begin.", options: ["can", "could", "will", "would"], answer: "will" },
+    ]
+  },
+  {
+    id: "ws-14", title: "Passive Voice Conversion", subject: "grammar", level: "Advanced",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "Active: 'The scientist discovered the vaccine.' Passive: 'The vaccine ___ discovered by the scientist.'", options: ["was", "were", "is", "are"], answer: "was" },
+      { id: "q2", question: "Active: 'They have completed the project.' Passive: 'The project ___ completed by them.'", options: ["has been", "have been", "was", "were"], answer: "has been" },
+      { id: "q3", question: "Active: 'The team is reviewing the data.' Passive: 'The data ___ reviewed by the team.'", options: ["is being", "is", "are being", "was"], answer: "is being" },
+      { id: "q4", question: "Convert to passive: 'The government will implement new policies.' Complete: 'New policies ___'", options: ["will be implemented", "will implement", "implemented", "will be implement"], answer: "will be implemented" },
+    ]
+  },
+  {
+    id: "ws-15", title: "Academic Vocabulary", subject: "vocabulary", level: "Advanced",
+    type: "match", completed: false,
+    questions: [
+      { id: "q1", question: "Match words to their definitions", answer: "", pairs: [
+        { left: "Hypothesis", right: "A proposed explanation" }, { left: "Methodology", right: "System of methods" },
+        { left: "Empirical", right: "Based on experience or observation" }, { left: "Cognitive", right: "Related to thinking" },
+      ] },
+    ]
+  },
+  {
+    id: "ws-16", title: "Phrasal Verbs Mastery", subject: "vocabulary", level: "Intermediate",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "I need to ___ up with my studies.", options: ["catch", "get", "look", "put"], answer: "catch" },
+      { id: "q2", question: "She decided to ___ down her job.", options: ["give", "put", "turn", "bring"], answer: "give" },
+      { id: "q3", question: "We should ___ out this opportunity.", options: ["look", "carry", "check", "make"], answer: "check" },
+      { id: "q4", question: "They ___ off the meeting until next week.", options: ["put", "give", "carry", "take"], answer: "put" },
+    ]
+  },
+  {
+    id: "ws-17", title: "Essay Structure & Coherence", subject: "writing", level: "Advanced",
+    type: "puzzle", completed: false,
+    questions: [
+      { id: "q1", question: "Arrange: thesis / statement / your / Clear / opening / every / should / have / essay", answer: "Every essay should have a clear opening thesis statement" },
+      { id: "q2", question: "What order? Introduction, ___, ___, ___", answer: "Body paragraphs, Conclusion, Bibliography" },
+      { id: "q3", question: "A paragraph should contain ___ main idea.", options: ["one", "two", "three"], answer: "one" },
+    ]
+  },
+  {
+    id: "ws-18", title: "Professional Email Writing", subject: "writing", level: "Intermediate",
+    type: "fill-blanks", completed: false,
+    questions: [
+      { id: "q1", question: "Complete: 'Dear Sir/Madam, I am writing to ___'", options: ["inquire", "tell you", "say", "ask"], answer: "inquire" },
+      { id: "q2", question: "'I would appreciate it if you could ___ this matter urgently.'", options: ["address", "talk", "say", "discuss"], answer: "address" },
+      { id: "q3", question: "'Thank you for your ___. I will follow up shortly.'", options: ["reply", "email", "response", "all"], answer: "all" },
+      { id: "q4", question: "'Best regards' is a professional ___.", options: ["closing", "opening", "salutation", "signature"], answer: "closing" },
+    ]
+  },
+  {
+    id: "ws-19", title: "Complex Sentence Combination", subject: "grammar", level: "Advanced",
+    type: "puzzle", completed: false,
+    questions: [
+      { id: "q1", question: "Combine with 'although': The weather was bad. We enjoyed the hike.", answer: "Although the weather was bad, we enjoyed the hike" },
+      { id: "q2", question: "Combine with 'whereas': She loves reading. He prefers sports.", answer: "She loves reading, whereas he prefers sports" },
+      { id: "q3", question: "Combine with 'because': He succeeded. He worked hard.", answer: "He succeeded because he worked hard" },
+    ]
+  },
+  {
+    id: "ws-20", title: "Literary Devices Identification", subject: "reading", level: "Advanced",
+    type: "match", completed: false,
+    questions: [
+      { id: "q1", question: "Match phrases to literary devices", answer: "", pairs: [
+        { left: "The night was a blanket", right: "Metaphor" }, { left: "As quiet as a mouse", right: "Simile" },
+        { left: "The cruel wind whispered", right: "Personification" }, { left: "I literally died laughing", right: "Exaggeration" },
+      ] },
+    ]
+  },
 ]
 
 // ===== QUIZZES =====
@@ -289,6 +437,205 @@ export const quizzes: Quiz[] = [
       { id: "q1", type: "multiple-choice", question: "Tom has a red ball. What color is Tom's ball?", options: ["Blue", "Red", "Green", "Yellow"], answer: "Red" },
       { id: "q2", type: "multiple-choice", question: "Sara likes to read books. What does Sara like to do?", options: ["Run", "Cook", "Read", "Sleep"], answer: "Read" },
       { id: "q3", type: "multiple-choice", question: "The cat sat on the mat. Where did the cat sit?", options: ["On the chair", "On the mat", "On the bed", "On the floor"], answer: "On the mat" },
+    ]
+  },
+  {
+    id: "quiz-5", title: "Numbers & Counting", subject: "vocabulary", level: "Beginner", timeLimit: 150,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What comes after 5?", options: ["3", "6", "4", "7"], answer: "6" },
+      { id: "q2", type: "multiple-choice", question: "How many fingers on one hand?", options: ["4", "5", "6", "10"], answer: "5" },
+      { id: "q3", type: "multiple-choice", question: "What is 10 + 5?", options: ["14", "15", "16", "20"], answer: "15" },
+      { id: "q4", type: "word-arrange", question: "Arrange: twenty / is / two / one / One", answer: "One and one is two" },
+      { id: "q5", type: "sentence-correction", question: "Fix: I has ten apples.", answer: "I have ten apples." },
+    ]
+  },
+  {
+    id: "quiz-6", title: "Days & Months", subject: "vocabulary", level: "Beginner", timeLimit: 180,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "How many days are in a week?", options: ["5", "6", "7", "8"], answer: "7" },
+      { id: "q2", type: "multiple-choice", question: "What day comes after Monday?", options: ["Sunday", "Tuesday", "Wednesday", "Friday"], answer: "Tuesday" },
+      { id: "q3", type: "multiple-choice", question: "Which month is Christmas?", options: ["November", "December", "January", "February"], answer: "December" },
+      { id: "q4", type: "multiple-choice", question: "What is today?", options: ["Never changes", "A day of the week", "A specific date", "All of the above"], answer: "All of the above" },
+    ]
+  },
+  {
+    id: "quiz-7", title: "Food & Drinks", subject: "vocabulary", level: "Beginner", timeLimit: 120,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Which is a fruit?", options: ["Carrot", "Apple", "Potato", "Broccoli"], answer: "Apple" },
+      { id: "q2", type: "multiple-choice", question: "What do we eat with?", options: ["Shoes", "Spoon", "Book", "Pillow"], answer: "Spoon" },
+      { id: "q3", type: "multiple-choice", question: "Which is a vegetable?", options: ["Banana", "Orange", "Carrot", "Grape"], answer: "Carrot" },
+      { id: "q4", type: "sentence-correction", question: "Fix: She like chicken.", answer: "She likes chicken." },
+    ]
+  },
+  {
+    id: "quiz-8", title: "Weather Words", subject: "vocabulary", level: "Intermediate", timeLimit: 180,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What do we need in the rain?", options: ["Hat", "Umbrella", "Shorts", "Sandals"], answer: "Umbrella" },
+      { id: "q2", type: "multiple-choice", question: "When does snow fall?", options: ["Summer", "Spring", "Winter", "Fall"], answer: "Winter" },
+      { id: "q3", type: "multiple-choice", question: "What is the opposite of hot?", options: ["Warm", "Cool", "Cold", "Freezing"], answer: "Cold" },
+      { id: "q4", type: "word-arrange", question: "Arrange: weather / sunny / The / is", answer: "The weather is sunny" },
+    ]
+  },
+  {
+    id: "quiz-9", title: "School Subjects", subject: "vocabulary", level: "Beginner", timeLimit: 150,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Which subject teaches about numbers?", options: ["Math", "English", "Science", "Art"], answer: "Math" },
+      { id: "q2", type: "multiple-choice", question: "What do we read in English class?", options: ["Numbers", "Books", "Paintings", "Maps"], answer: "Books" },
+      { id: "q3", type: "multiple-choice", question: "Which subject teaches about living things?", options: ["Math", "Science", "History", "Art"], answer: "Science" },
+      { id: "q4", type: "sentence-correction", question: "Fix: I studies English.", answer: "I study English." },
+    ]
+  },
+  {
+    id: "quiz-10", title: "Pronouns Practice", subject: "grammar", level: "Intermediate", timeLimit: 200,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "I, you, he, she are ___.", options: ["Nouns", "Verbs", "Pronouns", "Adjectives"], answer: "Pronouns" },
+      { id: "q2", type: "sentence-correction", question: "Fix: Him like to play.", answer: "He likes to play." },
+      { id: "q3", type: "sentence-correction", question: "Fix: She don't like math.", answer: "She doesn't like math." },
+      { id: "q4", type: "word-arrange", question: "Arrange: likes / We / to / play / games", answer: "We like to play games" },
+      { id: "q5", type: "multiple-choice", question: "What is the correct pronoun? ___ am happy.", options: ["He", "She", "I", "They"], answer: "I" },
+    ]
+  },
+  {
+    id: "quiz-11", title: "Present Tense Verbs", subject: "grammar", level: "Intermediate", timeLimit: 220,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "She ___ to school.", options: ["goes", "go", "going", "gone"], answer: "goes" },
+      { id: "q2", type: "multiple-choice", question: "They ___ in the park.", options: ["plays", "play", "playing", "played"], answer: "play" },
+      { id: "q3", type: "sentence-correction", question: "Fix: He don't like apples.", answer: "He doesn't like apples." },
+      { id: "q4", type: "word-arrange", question: "Arrange: drinks / water / He / every / day", answer: "He drinks water every day" },
+      { id: "q5", type: "multiple-choice", question: "I ___ English.", options: ["learns", "learn", "learning", "learnt"], answer: "learn" },
+    ]
+  },
+  {
+    id: "quiz-12", title: "Story Comprehension", subject: "reading", level: "Intermediate", timeLimit: 300,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Story: 'Tom went to the zoo. He saw lions, tigers, and bears. His favorite animal was the elephant.' What was Tom's favorite animal?", options: ["Lion", "Tiger", "Bear", "Elephant"], answer: "Elephant" },
+      { id: "q2", type: "multiple-choice", question: "Where did Tom go?", options: ["Park", "Zoo", "Beach", "School"], answer: "Zoo" },
+      { id: "q3", type: "multiple-choice", question: "What animals did Tom see?", options: ["Cats and dogs", "Lions, tigers, and bears", "Birds and fish", "Horses and cows"], answer: "Lions, tigers, and bears" },
+    ]
+  },
+  {
+    id: "quiz-13", title: "Adjectives Quiz", subject: "grammar", level: "Intermediate", timeLimit: 180,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Which word is an adjective? The ___ dog runs.", options: ["dog", "runs", "happy", "the"], answer: "happy" },
+      { id: "q2", type: "multiple-choice", question: "What is the opposite of big?", options: ["Huge", "Small", "Large", "Tiny"], answer: "Small" },
+      { id: "q3", type: "sentence-correction", question: "Fix: He is a quick runner.", answer: "He is a quick runner." },
+      { id: "q4", type: "word-arrange", question: "Arrange: cat / black / The / is", answer: "The cat is black" },
+    ]
+  },
+  {
+    id: "quiz-14", title: "Clothes & Fashion", subject: "vocabulary", level: "Beginner", timeLimit: 150,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What do we wear on our feet?", options: ["Hat", "Shirt", "Shoes", "Pants"], answer: "Shoes" },
+      { id: "q2", type: "multiple-choice", question: "What do we wear on cold days?", options: ["T-shirt", "Jacket", "Shorts", "Sandals"], answer: "Jacket" },
+      { id: "q3", type: "multiple-choice", question: "What covers our legs?", options: ["Shirt", "Hat", "Pants", "Shoes"], answer: "Pants" },
+      { id: "q4", type: "word-arrange", question: "Arrange: blue / wearing / She / a / is / dress", answer: "She is wearing a blue dress" },
+    ]
+  },
+  {
+    id: "quiz-15", title: "Hobbies & Activities", subject: "vocabulary", level: "Beginner", timeLimit: 170,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Which hobby uses a ball?", options: ["Reading", "Playing", "Drawing", "Singing"], answer: "Playing" },
+      { id: "q2", type: "multiple-choice", question: "What do you do with a book?", options: ["Draw", "Eat", "Read", "Sing"], answer: "Read" },
+      { id: "q3", type: "multiple-choice", question: "Which activity needs a bike?", options: ["Swimming", "Cycling", "Running", "Jumping"], answer: "Cycling" },
+      { id: "q4", type: "sentence-correction", question: "Fix: I likes to play football.", answer: "I like to play football." },
+    ]
+  },
+  {
+    id: "quiz-16", title: "Conditional Sentences", subject: "grammar", level: "Intermediate", timeLimit: 250,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Complete: If I were rich, I ___ travel the world.", options: ["will", "would", "can", "could"], answer: "would" },
+      { id: "q2", type: "sentence-correction", question: "Fix: If you study harder, you will passes the exam.", answer: "If you study harder, you will pass the exam." },
+      { id: "q3", type: "multiple-choice", question: "What is the third conditional used for?", options: ["Present situations", "Future situations", "Past impossibilities", "Habits"], answer: "Past impossibilities" },
+      { id: "q4", type: "word-arrange", question: "Arrange: would / she / passed / If / have / exam / the / she", answer: "If she had passed the exam, she would have been happy" },
+      { id: "q5", type: "sentence-correction", question: "Fix: Unless you don't leave now, you will be late.", answer: "Unless you leave now, you will be late." },
+    ]
+  },
+  {
+    id: "quiz-17", title: "Passive Voice Mastery", subject: "grammar", level: "Advanced", timeLimit: 300,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Convert to passive: 'The chef prepared the meal.' Correct form?", options: ["The meal was prepared by the chef", "The meal has been prepared by the chef", "The preparation was done", "The chef was prepared"], answer: "The meal was prepared by the chef" },
+      { id: "q2", type: "sentence-correction", question: "Fix: The report has been completed by the team yesterday.", answer: "The report was completed by the team yesterday." },
+      { id: "q3", type: "multiple-choice", question: "Which sentence is passive voice?", options: ["He wrote the book", "The book was written by him", "He is writing", "He will write"], answer: "The book was written by him" },
+      { id: "q4", type: "word-arrange", question: "Arrange: has / been / research / The / conducted / recently", answer: "The research has been conducted recently" },
+      { id: "q5", type: "sentence-correction", question: "Fix: The software was developing by experienced programmers.", answer: "The software was developed by experienced programmers." },
+    ]
+  },
+  {
+    id: "quiz-18", title: "Business & Professional English", subject: "vocabulary", level: "Intermediate", timeLimit: 280,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What does 'deadline' mean in business?", options: ["The end of a project", "The final date to complete work", "A line drawn at the end", "The ending of employment"], answer: "The final date to complete work" },
+      { id: "q2", type: "multiple-choice", question: "Complete the email phrase: 'I look forward to ___ from you.'", options: ["heard", "hearing", "hear", "to hear"], answer: "hearing" },
+      { id: "q3", type: "sentence-correction", question: "Fix: The meeting will be held on Monday next week at 2 PM.", answer: "The meeting will be held on Monday next week at 2 PM." },
+      { id: "q4", type: "word-arrange", question: "Arrange: the / Please / feedback / your / provide", answer: "Please provide your feedback" },
+      { id: "q5", type: "multiple-choice", question: "In business writing, 'CC' means?", options: ["Customer Care", "Carbon Copy", "Cost Control", "Creative Content"], answer: "Carbon Copy" },
+    ]
+  },
+  {
+    id: "quiz-19", title: "Academic Writing & Essays", subject: "writing", level: "Advanced", timeLimit: 320,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What should an academic essay introduction contain?", options: ["Your opinion only", "A thesis statement", "Only background info", "Just the conclusion"], answer: "A thesis statement" },
+      { id: "q2", type: "sentence-correction", question: "Fix: The research show that climate change is significantly.", answer: "The research shows that climate change is significant." },
+      { id: "q3", type: "multiple-choice", question: "Which transition word is best? 'However, ___ evidence suggests otherwise.'", options: ["the other", "other", "another", "more recent"], answer: "more recent" },
+      { id: "q4", type: "word-arrange", question: "Arrange: findings / The / suggest / that / limitations / had / study / the", answer: "The findings suggest that the study had limitations" },
+      { id: "q5", type: "sentence-correction", question: "Fix: In conclusion, we can say that the data demonstrates the hypothesis.", answer: "In conclusion, the data demonstrates the hypothesis." },
+    ]
+  },
+  {
+    id: "quiz-20", title: "Literary Analysis", subject: "reading", level: "Advanced", timeLimit: 350,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What is 'metaphor'?", options: ["A comparison using 'like' or 'as'", "A direct comparison without 'like' or 'as'", "Repetition of sounds", "Exaggeration for effect"], answer: "A direct comparison without 'like' or 'as'" },
+      { id: "q2", type: "multiple-choice", question: "In literature, what does 'irony' mean?", options: ["Being funny", "When reality contradicts expectations", "Being sad", "Telling jokes"], answer: "When reality contradicts expectations" },
+      { id: "q3", type: "multiple-choice", question: "What is the 'protagonist'?", options: ["The villain", "The main character", "A minor role", "The narrator"], answer: "The main character" },
+      { id: "q4", type: "sentence-correction", question: "Fix: The symbolism of the dove represents peace throughout the novella.", answer: "The symbolism of the dove represents peace throughout the novella." },
+      { id: "q5", type: "word-arrange", question: "Arrange: literary / The / devices / author / various / employed / has", answer: "The author has employed various literary devices" },
+    ]
+  },
+  {
+    id: "quiz-21", title: "Technology & Modern Vocabulary", subject: "vocabulary", level: "Intermediate", timeLimit: 200,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What does 'API' stand for?", options: ["Application Program Interface", "Advanced Programming Item", "Automated Process Instruction", "Application Procedure Indicator"], answer: "Application Program Interface" },
+      { id: "q2", type: "multiple-choice", question: "Complete: 'I need to ___ my password regularly for security.'", options: ["change", "update", "modify", "all of the above"], answer: "all of the above" },
+      { id: "q3", type: "sentence-correction", question: "Fix: The software updates has been installing for two hours.", answer: "The software updates have been installing for two hours." },
+      { id: "q4", type: "word-arrange", question: "Arrange: connection / a / stable / requires / Video / conference / internet", answer: "Video conference requires a stable internet connection" },
+      { id: "q5", type: "multiple-choice", question: "What is 'cybersecurity'?", options: ["Computer games", "Protection against digital attacks", "Internet history", "Web design"], answer: "Protection against digital attacks" },
+    ]
+  },
+  {
+    id: "quiz-22", title: "Social Issues & Debate", subject: "vocabulary", level: "Advanced", timeLimit: 300,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What does 'sustainability' mean in environmental context?", options: ["Making things last", "Meeting present needs without harming future generations", "Using resources slowly", "Not wasting time"], answer: "Meeting present needs without harming future generations" },
+      { id: "q2", type: "sentence-correction", question: "Fix: The government has to address the issue about poverty.", answer: "The government has to address the issue of poverty." },
+      { id: "q3", type: "multiple-choice", question: "Complete: 'Education is fundamental to ___ development.'", options: ["social", "sustainable", "human", "all of the above"], answer: "all of the above" },
+      { id: "q4", type: "word-arrange", question: "Arrange: inequality / economic / has / on / significant / impact / society", answer: "Economic inequality has significant impact on society" },
+      { id: "q5", type: "multiple-choice", question: "What is a 'demographic'?", options: ["A country's government", "A statistical characteristic of a population", "A type of graph", "A marketing strategy"], answer: "A statistical characteristic of a population" },
+    ]
+  },
+  {
+    id: "quiz-23", title: "Nuanced Grammar (Advanced)", subject: "grammar", level: "Advanced", timeLimit: 280,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Use the correct form: 'I wish I ___ known about the meeting.'", options: ["had", "have", "would have", "should have"], answer: "had" },
+      { id: "q2", type: "sentence-correction", question: "Fix: Despite of the challenges, the team succeeded.", answer: "Despite the challenges, the team succeeded." },
+      { id: "q3", type: "multiple-choice", question: "Which is correct? 'Neither the manager nor the employees ___'", options: ["was", "were", "have", "is"], answer: "were" },
+      { id: "q4", type: "word-arrange", question: "Arrange: must / important / that / be / It / thorough / the / analysis", answer: "It must be that the analysis is thorough" },
+      { id: "q5", type: "sentence-correction", question: "Fix: The data suggests that students, which studied more, performed better.", answer: "The data suggests that students who studied more performed better." },
+    ]
+  },
+  {
+    id: "quiz-24", title: "TOEFL Style Comprehensive", subject: "reading", level: "Advanced", timeLimit: 400,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "Passage: 'Photosynthesis is the process by which plants convert light energy into chemical energy.' What is the main purpose of photosynthesis according to this?", options: ["To create light", "To convert light to chemical energy", "To feed animals", "To create oxygen"], answer: "To convert light to chemical energy" },
+      { id: "q2", type: "multiple-choice", question: "What can be inferred about plants from the passage?", options: ["They need sunlight", "They are complex", "They are simple", "They don't need water"], answer: "They need sunlight" },
+      { id: "q3", type: "multiple-choice", question: "The word 'convert' in the passage likely means?", options: ["Change", "Create", "Remove", "Add"], answer: "Change" },
+    ]
+  },
+  {
+    id: "quiz-25", title: "Idiomatic Expressions & Phrasal Verbs", subject: "vocabulary", level: "Intermediate", timeLimit: 220,
+    questions: [
+      { id: "q1", type: "multiple-choice", question: "What does 'break the ice' mean?", options: ["Literally break ice", "Start a conversation", "End a relationship", "Take a break"], answer: "Start a conversation" },
+      { id: "q2", type: "multiple-choice", question: "Complete: 'I need to ___ up on my studies before the exam.'", options: ["catch", "pick", "look", "move"], answer: "catch" },
+      { id: "q3", type: "sentence-correction", question: "Fix: She puts off her responsibilities always.", answer: "She is always putting off her responsibilities." },
+      { id: "q4", type: "word-arrange", question: "Arrange: put / important / to / clients / We / first / our", answer: "We put important clients first" },
+      { id: "q5", type: "multiple-choice", question: "What does 'give up' mean?", options: ["Surrender or stop trying", "Give something away", "Give a presentation", "Stop at a location"], answer: "Surrender or stop trying" },
     ]
   },
 ]
