@@ -58,14 +58,14 @@ class InteractionOut(BaseModel):
 
 class RegisterRequest(BaseModel):
     email: str = Field(min_length=5, max_length=255)
-    password: str = Field(min_length=6, max_length=128)
+    password: str = Field(min_length=8, max_length=128)
     name: str = Field(min_length=1, max_length=100)
     avatar: str = Field(default="fox", min_length=1, max_length=40)
 
 
 class LoginRequest(BaseModel):
     email: str = Field(min_length=5, max_length=255)
-    password: str = Field(min_length=6, max_length=128)
+    password: str = Field(min_length=8, max_length=128)
 
 
 class UserResponse(BaseModel):
@@ -132,3 +132,27 @@ class CompleteLessonResponse(BaseModel):
     code: str
     learner_id: str
     completed: bool
+
+
+class GenerateLessonRequest(BaseModel):
+    learner_id: str = Field(min_length=1, max_length=100)
+    skill_level: str = Field(min_length=1, max_length=30)
+    current_topic: str = Field(min_length=1, max_length=80)
+    age_band: str = Field(default="16-21", min_length=1, max_length=20)
+    learning_goal: str | None = Field(default=None, max_length=240)
+    interests: list[str] = Field(default_factory=list)
+
+
+class GeneratedLessonContent(BaseModel):
+    warmup: list[str] = Field(default_factory=list)
+    explanation: str = ""
+    guided_practice: list[str] = Field(default_factory=list)
+    production_task: str = ""
+    quiz_questions: list[dict] = Field(default_factory=list)
+    reflection: list[str] = Field(default_factory=list)
+
+
+class GenerateLessonResponse(BaseModel):
+    needs_user_input: bool = False
+    question_for_user: str | None = None
+    lesson: dict | None = None

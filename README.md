@@ -5,7 +5,7 @@ AI-powered English learning web app for students (kids to young adults) focused 
 - Frontend: Next.js (Node)
 - Backend: FastAPI
 - AI: Ollama API via LangChain (`langchain_ollama.ChatOllama`)
-- Database: SQLite
+- Database: SQLite (dev) or Postgres (production)
 - Auth: Email + password (JWT) with browser profile fallback
 
 ## Project Phases
@@ -56,6 +56,15 @@ uvicorn app.main:app --reload --port 8000
 
 Health check: `http://localhost:8000/health`
 
+Optional seed data:
+
+```bash
+python scripts/init_deploy.py
+python scripts/seed_data.py
+```
+
+`init_deploy.py` is idempotent and ensures required DB tables exist before app usage.
+
 ## 3) Run frontend (Next.js)
 
 ```bash
@@ -77,6 +86,30 @@ Open `http://localhost:3000`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `PUT /api/auth/me`
+- `POST /api/lessons/generate-json`
+
+## AI Lesson Generation JSON Endpoint
+
+`POST /api/lessons/generate-json`
+
+Request body:
+
+```json
+{
+  "learner_id": "user-42",
+  "skill_level": "Intermediate",
+  "current_topic": "Job interviews",
+  "age_band": "16-21",
+  "learning_goal": "Speak confidently in interview answers",
+  "interests": ["technology", "startups"]
+}
+```
+
+If `learning_goal` is omitted, the API returns `needs_user_input=true` with a question asking what they want to learn.
+
+## Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for Vercel + FastAPI + Postgres production setup.
 
 ## Demo Flow (for non-technical audience)
 1. Open the landing page and dashboard.
@@ -89,3 +122,4 @@ Open `http://localhost:3000`
 ## Notes
 - If Ollama API is unreachable, backend returns safe fallback responses so your demo still works.
 - Data is stored in local SQLite file: `backend/english_app.db`.
+- Signup password policy (backend-enforced): minimum 8 chars, includes uppercase, lowercase, and number.

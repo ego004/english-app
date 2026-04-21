@@ -21,6 +21,39 @@ def _fallback_response(task: str, text: str) -> str:
                 "tip": "Use short, clear sentences with subject + verb + object.",
             }
         )
+    if task == "lesson_generation":
+        return json.dumps(
+            {
+                "title": f"{text.title()} Practice Lesson",
+                "metadata": {
+                    "age_band": "16-21",
+                    "skill_level": "Intermediate",
+                    "topic": text,
+                    "goal": "Improve practical communication confidence",
+                    "duration_minutes": 25,
+                },
+                "content": {
+                    "warmup": ["Share one personal experience about the topic in 3 lines."],
+                    "explanation": "Focus on sentence clarity, useful vocabulary, and natural transitions.",
+                    "guided_practice": ["Rewrite three simple sentences into stronger academic/professional ones."],
+                    "production_task": "Write or say a short response using at least five target words.",
+                    "quiz_questions": [
+                        {
+                            "type": "multiple-choice",
+                            "question": "Which sentence is grammatically correct?",
+                            "options": [
+                                "She go to college every day.",
+                                "She goes to college every day.",
+                                "She going to college every day.",
+                                "She gone to college every day.",
+                            ],
+                            "answer": "She goes to college every day.",
+                        }
+                    ],
+                    "reflection": ["What did you improve today?", "What is your next step?"],
+                },
+            }
+        )
     return json.dumps(
         {
             "score": 78,

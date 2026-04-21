@@ -1,4 +1,20 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+const API_BASE = (
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:8000"
+).replace(/\/$/, "")
+
+function getNetworkErrorMessage(action: string): string {
+  return `${action} failed: cannot reach API at ${API_BASE}. Check backend URL/CORS and NEXT_PUBLIC_API_BASE_URL.`
+}
+
+async function fetchWithNetworkHint(input: string, init: RequestInit, action: string): Promise<Response> {
+  try {
+    return await fetch(input, init)
+  } catch {
+    throw new Error(getNetworkErrorMessage(action))
+  }
+}
 
 function extractApiErrorMessage(errorBody: unknown, fallback: string): string {
   if (!errorBody || typeof errorBody !== "object") {
@@ -124,16 +140,31 @@ export type LessonDetail = LessonSummary & {
   }
 }
 
+export type GenerateLessonPayload = {
+  learner_id: string
+  skill_level: string
+  current_topic: string
+  age_band: "6-10" | "11-15" | "16-21"
+  learning_goal?: string
+  interests?: string[]
+}
+
+export type GenerateLessonResult = {
+  needs_user_input: boolean
+  question_for_user?: string | null
+  lesson?: Record<string, unknown> | null
+}
+
 export async function getSpeakingFeedback(payload: {
   learner_id: string
   prompt: string
   transcript: string
 }): Promise<SpeakingFeedbackResponse> {
-  const response = await fetch(`${API_BASE}/api/speaking/feedback`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/speaking/feedback`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  })
+  }, "Speaking feedback")
 
   if (!response.ok) {
     throw new Error(`Speaking feedback failed with status ${response.status}`)
@@ -146,11 +177,11 @@ export async function getGrammarCorrection(payload: {
   learner_id: string
   text: string
 }): Promise<GrammarCorrectionResponse> {
-  const response = await fetch(`${API_BASE}/api/grammar/correct`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/grammar/correct`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  })
+  }, "Grammar correction")
 
   if (!response.ok) {
     throw new Error(`Grammar correction failed with status ${response.status}`)
@@ -164,11 +195,11 @@ export async function getConversationReply(payload: {
   message: string
   proficiency_level: string
 }): Promise<ConversationReplyResponse> {
-  const response = await fetch(`${API_BASE}/api/conversation/reply`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/conversation/reply`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  })
+  }, "Conversation reply")
 
   if (!response.ok) {
     throw new Error(`Conversation reply failed with status ${response.status}`)
@@ -178,7 +209,11 @@ export async function getConversationReply(payload: {
 }
 
 export async function getLearnerProgress(learnerId: string, limit = 50): Promise<ProgressInteraction[]> {
-  const response = await fetch(`${API_BASE}/api/progress/${encodeURIComponent(learnerId)}?limit=${limit}`)
+  const response = await fetchWithNetworkHint(
+    `${API_BASE}/api/progress/${encodeURIComponent(learnerId)}?limit=${limit}`,
+    { method: "GET" },
+    "Progress fetch"
+  )
 
   if (!response.ok) {
     throw new Error(`Progress fetch failed with status ${response.status}`)
@@ -194,7 +229,11 @@ export async function getParentSummary(learnerId?: string, limit = 100): Promise
   }
   params.set("limit", String(limit))
 
-  const response = await fetch(`${API_BASE}/api/parent/summary?${params.toString()}`)
+  const response = await fetchWithNetworkHint(
+    `${API_BASE}/api/parent/summary?${params.toString()}`,
+    { method: "GET" },
+    "Parent summary fetch"
+  )
 
   if (!response.ok) {
     throw new Error(`Parent summary fetch failed with status ${response.status}`)
@@ -209,11 +248,11 @@ export async function registerWithEmail(payload: {
   name: string
   avatar: string
 }): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE}/api/auth/register`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  })
+  }, "Registration")
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
@@ -227,11 +266,11 @@ export async function loginWithEmail(payload: {
   email: string
   password: string
 }): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE}/api/auth/login`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-  })
+  }, "Login")
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
@@ -242,12 +281,12 @@ export async function loginWithEmail(payload: {
 }
 
 export async function getCurrentUser(token: string): Promise<AuthUser> {
-  const response = await fetch(`${API_BASE}/api/auth/me`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/auth/me`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  })
+  }, "Current user fetch")
 
   if (!response.ok) {
     throw new Error("Failed to fetch current user")
@@ -272,7 +311,11 @@ export async function getLessons(payload: {
     params.set("level", payload.level)
   }
 
-  const response = await fetch(`${API_BASE}/api/lessons?${params.toString()}`)
+  const response = await fetchWithNetworkHint(
+    `${API_BASE}/api/lessons?${params.toString()}`,
+    { method: "GET" },
+    "Lessons fetch"
+  )
   if (!response.ok) {
     throw new Error(`Lessons fetch failed with status ${response.status}`)
   }
@@ -283,7 +326,11 @@ export async function getLessonByCode(payload: { learner_id: string; lesson_code
   const params = new URLSearchParams()
   params.set("learner_id", payload.learner_id)
 
-  const response = await fetch(`${API_BASE}/api/lessons/${encodeURIComponent(payload.lesson_code)}?${params.toString()}`)
+  const response = await fetchWithNetworkHint(
+    `${API_BASE}/api/lessons/${encodeURIComponent(payload.lesson_code)}?${params.toString()}`,
+    { method: "GET" },
+    "Lesson fetch"
+  )
   if (!response.ok) {
     throw new Error(`Lesson fetch failed with status ${response.status}`)
   }
@@ -294,11 +341,11 @@ export async function completeLesson(payload: {
   learner_id: string
   lesson_code: string
 }): Promise<{ completed: boolean }> {
-  const response = await fetch(`${API_BASE}/api/lessons/${encodeURIComponent(payload.lesson_code)}/complete`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/lessons/${encodeURIComponent(payload.lesson_code)}/complete`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ learner_id: payload.learner_id }),
-  })
+  }, "Lesson completion")
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
@@ -312,17 +359,32 @@ export async function updateCurrentUser(
   token: string,
   payload: { name: string; avatar: string }
 ): Promise<AuthUser> {
-  const response = await fetch(`${API_BASE}/api/auth/me`, {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/auth/me`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
-  })
+  }, "Profile update")
 
   if (!response.ok) {
     throw new Error("Failed to update user profile")
+  }
+
+  return response.json()
+}
+
+export async function generateLessonJson(payload: GenerateLessonPayload): Promise<GenerateLessonResult> {
+  const response = await fetchWithNetworkHint(`${API_BASE}/api/lessons/generate-json`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  }, "Lesson generation")
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}))
+    throw new Error(extractApiErrorMessage(error, "Lesson generation failed"))
   }
 
   return response.json()
